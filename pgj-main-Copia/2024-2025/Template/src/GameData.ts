@@ -14,7 +14,6 @@ export let GameData: gameData = {
     loadingText: "Caricamento...",
     loadingTextFont: "roboto",
     loadingTextComplete: "Tappa/clicca per iniziare!!",
-    loadingTextCompleteA: "Tappa/clicca per iniziare!!Pippo",
     loadingTextY: 700,
     loadingBarColor: 0xff0000,
     loadingBarY: 630,
@@ -27,6 +26,7 @@ export let GameData: gameData = {
   ],
   images: [
 
+    { name: "omino", path: "src/assets/images/uomo_corre.png" },
     { name: "phaser", path: "assets/images/logo-phaser.png" },
     { name: "freedoom", path: "assets/images/freedoom.png" },
     { name: "thelucasart", path: "assets/images/thelucasart.png" },

@@ -22,7 +22,7 @@ export default class Intro extends Phaser.Scene {
       //fermiamo la scena corrente
       this.scene.stop("Intro");
       //richiamiamo il metodo start della far partire la scena Intro
-      this.scene.start("Scena1");
+      this.scene.start("GamePlay");
 
     });
 
