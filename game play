@@ -1,0 +1,141 @@
+import Ball from "../gameComponents/ball/Ball";
+import Player from "../gameComponents/player/Player";
+
+export default class GamePlay extends Phaser.Scene {
+
+  private bricks: Phaser.Physics.Arcade.StaticGroup;
+  //private paddle: Phaser.Physics.Arcade.Image;
+  private ball: Ball;
+  private player: Player; 
+
+  constructor() {
+    super({
+      key: "GamePlay",
+    });
+
+    this.bricks;
+    //this.paddle;
+    this.ball;   
+  }
+
+
+
+
+  create() {
+ //  Enable world bounds, but disable the floor
+ this.physics.world.setBoundsCollision(true, true, true, false);
+
+ //  Create the bricks in a 10x6 grid
+ this.bricks = this.physics.add.staticGroup({
+     key: 'assets', frame: [ 'blue1', 'red1', 'green1', 'yellow1', 'silver1', 'purple1' ],
+     frameQuantity: 16,
+     gridAlign: { width: 16, height: 6, cellWidth: 64, cellHeight: 32, x: 128, y: 100 }
+ });
+
+ this.ball = new Ball({scene: this, x: 640, y: 700, key: "assets", frame: "ball1"});
+ this.ball.setData('onPaddle', true);
+ 
+ //this.paddle = this.physics.add.image(640, 700, 'assets', 'paddle1').setImmovable();
+
+ this.player= new Player({
+  scene: this,
+  x:640,
+  y:750,
+  key: "assets",
+  frame: "paddle1"
+  });
+ 
+ //  Our colliders
+ this.physics.add.collider(this.ball, this.bricks, this.hitBrick, null, this);
+ this.physics.add.collider(this.ball, this.player, this.hitPaddle, null, this);
+ //  Input events
+ this.input.on('pointermove',  (pointer: Phaser.Input.Pointer) =>
+ {
+
+     //  Keep the paddle within the game
+     this.player.x = Phaser.Math.Clamp(pointer.x, 52, 1280-52);
+
+     if (this.ball.getData('onPaddle'))
+     {
+         this.ball.x = this.player.x;
+     }
+
+ }, this);
+
+ this.input.on('pointerup',  (pointer: Phaser.Input.Pointer) =>
+ {
+
+     if (this.ball.getData('onPaddle'))
+     {
+         this.ball.setVelocity(-75, -600);
+         this.ball.setData('onPaddle', false);
+     }
+
+ },
+  this); 
+ }
+
+ hitBrick (ball:any, brick:any)
+ {
+     brick.disableBody(true, true);
+
+     if (this.bricks.countActive() === 0)
+     {
+         this.resetLevel();
+     }
+ }
+
+ resetBall ()
+ {
+     this.ball.setVelocity(0, 0);
+     this.ball.setPosition(this.player.x, 650);
+     this.ball.setData('onPaddle', true);
+ }
+
+ resetLevel ()
+ {
+     this.resetBall();
+
+     this.bricks.children.each(
+      (brick: any ) =>
+     brick.enableBody(false, 0, 0, true, true));
+ }
+
+ hitPaddle (ball: any, paddle: any)
+    {
+        let diff = 0;
+
+
+
+        if (ball.x < paddle.x)
+        {
+            //  Ball is on the left-hand side of the paddle
+            diff = paddle.x - ball.x;
+            ball.setVelocityX(-10 * diff);
+        }
+        else if (ball.x > paddle.x)
+        {
+            //  Ball is on the right-hand side of the paddle
+            diff = ball.x - paddle.x;
+            ball.setVelocityX(10 * diff);
+        }
+        else
+        {
+            //  Ball is perfectly in the middle
+            //  Add a little random X to stop it bouncing straight up!
+            ball.setVelocityX(2 + Math.random() * 8);
+        }
+    }
+
+  update(time: number, delta: number): void {
+
+
+    if (this.ball.y > 800)
+      {
+          this.resetBall();
+      }
+
+  }
+
+
+}
